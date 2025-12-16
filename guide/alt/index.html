@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sovereign Survival · Food + Water + Health (Gamified, Offline‑ready)</title>
+  <meta name="description" content="Ultra-long, gamified survival guide merging Water & Food Sovereignty with practical health & first aid. IndexedDB, Habitica integration, WebLLM field assistant, and animated starfield.">
+  <link rel="canonical" href="/" />
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Sovereign Survival · Food + Water + Health" />
+  <meta property="og:description" content="Gamified, offline-capable survival + sovereignty guide with Habitica, WebLLM, IndexedDB." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="/" />
+  <meta property="og:image" content="/cover.jpg" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Sovereign Survival · Food + Water + Health" />
+  <meta name="twitter:description" content="Gamified, offline-capable survival + sovereignty guide with Habitica + WebLLM." />
+  <meta name="twitter:image" content="/cover.jpg" />
+
+  <!-- JSON-LD (schema.org + requested presentation schema) -->
+  <script type="application/ld+json">
+  {
+    "@context": [
+      "https://schema.org",
+      "https://planetaryrestorationarchive.com/ref/crypto/sol/custom/gpt/rare/peace/engineer/hybrid"
+    ],
+    "@type": "CreativeWork",
+    "name": "Sovereign Survival — All-in-One (Water + Food + Health)",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "about": [
+      "All-hazards survival readiness",
+      "Water sovereignty",
+      "Food sovereignty",
+      "First aid fundamentals"
+    ],
+    "audience": {"@type":"Audience","audienceType":"Households, co-ops, village committees"},
+    "learningResourceType": ["Interactive tutorial","checklist","quest log"],
+    "mainEntityOfPage": "/"
+  }
+  </script>
+
+  <style>
+    :root{
+      --ink:#e6f2ff; --ink-dim:#adc8e6; --bg:#02030a; --panel:#0e1220;
+      --accent:#7dd3fc; --accent-2:#a78bfa; --good:#34d399; --warn:#f59e0b; --bad:#ef4444;
+      --muted:#a2b3c7; --card:#0b0f1a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:radial-gradient(1400px 900px at 70% 8%, #0b1430 0%, #071025 42%, var(--bg) 100%);
+      color:var(--ink); font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell;
+      overflow-x:hidden;
+    }
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+    header{
+      position:sticky; top:0; z-index:80; backdrop-filter:saturate(120%) blur(8px);
+      background:linear-gradient(180deg, rgba(2,3,10,.92), rgba(2,3,10,.55) 70%, rgba(2,3,10,0));
+      border-bottom:1px solid rgba(125,211,252,.1);
+    }
+    .wrap{max-width:1140px; margin:0 auto; padding:0 16px}
+    nav{display:flex; gap:16px; align-items:center; padding:12px 0}
+    .brand{font-weight:700; letter-spacing:.4px}
+    .small{font-size:.92rem; opacity:.9}
+    .right{margin-left:auto}
+
+    .starfield{position:fixed; inset:0; z-index:-1; background:transparent; pointer-events:none}
+
+    .hero{padding:54px 0 18px}
+    .hero h1{margin:.25em 0; font-size:clamp(1.9rem, 2.2vw + 1rem, 3.1rem); line-height:1.18}
+    .sub{color:var(--ink-dim); max-width:70ch}
+
+    .grid{display:grid; gap:16px}
+    .two{grid-template-columns:1fr}
+    @media (min-width:880px){ .two{grid-template-columns:1fr 1fr} }
+
+    .card{
+      background:linear-gradient(180deg, rgba(13,20,37,.92), rgba(10,14,26,.9));
+      border:1px solid rgba(125,211,252,.1); border-radius:14px; padding:16px;
+      box-shadow:0 10px 28px rgba(1,6,20,.44);
+    }
+    .panel{background:var(--panel); border:1px solid rgba(125,211,252,.12); border-radius:12px; padding:14px}
+    .panel h2{margin:.2em 0 .6em}
+    .muted{color:var(--muted)}
+    .note{border-left:3px solid var(--accent); background:#081226; padding:10px 12px; border-radius:8px}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.86em; padding:.12em .5em; border:1px solid rgba(125,211,252,.25); border-radius:6px; background:#0a1222}
+
+    .meter{height:10px; background:#0a0f1a; border-radius:999px; overflow:hidden; border:1px solid rgba(125,211,252,.15)}
+    .meter > b{display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-2)); width:0%}
+
+    label.inline{display:flex; gap:8px; align-items:center}
+    .tag{display:inline-flex; align-items:center; gap:6px; padding:2px 8px; border-radius:999px; border:1px solid rgba(125,211,252,.2); background:#0a1020; color:var(--ink); font-size:.78rem}
+
+    button, input, select, textarea{
+      background:#0c1224; color:var(--ink); border:1px solid rgba(125,211,252,.25); padding:.6em .8em; border-radius:10px; font:inherit;
+      box-shadow:inset 0 0 0 1px rgba(125,211,252,.06);
+    }
+    button{cursor:pointer}
+    button.primary{background:linear-gradient(180deg, #09243a, #081b2d); border-color:rgba(125,211,252,.4)}
+    button.good{border-color:rgba(52,211,153,.35)}
+    button.warn{border-color:rgba(245,158,11,.4)}
+    button.bad{border-color:rgba(239,68,68,.4)}
+
+    /* reduced motion: hide starfield */
+    @media (prefers-reduced-motion: reduce){ .starfield{display:none} }
+  </style>
+</head>
+<body>
+<canvas class="starfield" id="stars" aria-hidden="true"></canvas>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="brand">Planetary Restoration Archive · Sovereign Survival</div>
+      <a class="small" href="#survival">/survival/</a>
+      <a class="small" href="#water">/water/</a>
+      <a class="small" href="#food">/food/</a>
+      <span class="right small muted">Offline‑capable · IndexedDB · WebLLM · Habitica</span>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero card">
+    <h1>All‑Inclusive Survival · Food & Water Sovereignty</h1>
+    <p class="sub">
+      A single, offline‑capable playbook: go‑bag to seasons‑long resilience, safe water, sovereign food, and first‑aid fundamentals.
+      Progress saves locally. Export anytime. Earn XP by completing quests and logging evidence. WebLLM runs privately in your browser (WebGPU).
+    </p>
+    <div class="grid two">
+      <div class="panel">
+        <h3>Profile</h3>
+        <div class="grid">
+          <div class="inline"><span class="muted">Level</span><b id="level">1 — Initiate</b></div>
+          <div class="inline"><span class="muted">XP</span><span class="tag"><b id="xp">0</b></span></div>
+          <div class="muted">Quest Meter</div>
+          <div class="meter"><b id="meter" style="width:0%"></b></div>
+          <div class="inline"><span class="muted">Network</span><span class="tag" id="lbTag">Low‑BW: auto</span></div>
+        </div>
+        <div style="margin-top:10px" class="inline">
+          <button class="primary" id="newGame">New Game</button>
+          <button id="exportBtn">Export</button>
+          <label class="tag" style="cursor:pointer">Import
+            <input id="importFile" type="file" accept="application/json" style="display:none">
+          </label>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Toolbox</h3>
+        <p class="muted">Habitica integration, WebLLM field assistant, indexed inventory & notes, calculators for water sizing and calories, and printable checklists.</p>
+        <div class="grid">
+          <div>
+            <a class="tag" href="#habitica">Habitica</a>
+            <a class="tag" href="#assistant">WebLLM</a>
+            <a class="tag" href="#inventory">Inventory</a>
+            <a class="tag" href="#calc">Calculators</a>
+          </div>
+          <p class="note"><strong>Medical safety:</strong> This guide cannot replace professional care. It avoids instructions that would enable drug synthesis, culturing organisms, or unsafe chemical processes. For emergencies, seek trained help when at all possible.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SURVIVAL CORE ================= -->
+  <section id="survival" class="panel">
+    <h2>Survival Core (All‑Hazards)</h2>
+    <div class="grid two">
+      <div class="panel">
+        <h3>Priority Pyramid</h3>
+        <ol>
+          <li><strong>Scene safety → DR‑ABC</strong> (Danger, Response, Airway, Breathing, Circulation). Follow evidence‑based first‑aid guidelines; escalate early. 0</li>
+          <li><strong>Air & Warmth.</strong> Treat hypothermia with gentle rewarming; keep airway clear; avoid rough handling. 1</li>
+          <li><strong>Water.</strong> Minimum survival ~7.5–15 L/person/day (drinking+cooking+hygiene), aiming for 15–20 L where feasible. 2</li>
+          <li><strong>Food.</strong> Planning baseline ~2,100 kcal/person/day (context‑dependent). 3</li>
+          <li><strong>Sanitation & Comms.</strong> Hand hygiene with soap or ABHR (≥60%); alternatives only as a last resort per local guidance. 4</li>
+        </ol>
+        <div class="note">Some public guidelines diverge on “ash as soap.” Global monitoring frameworks don’t count ash as soap, though certain emergency protocols allow it as a fallback when nothing else is available. Prioritize real soap or ABHR. 5</div>
+      </div>
+      <div class="panel">
+        <h3>Go‑Bag & Home Base</h3>
+        <ul>
+          <li>Go‑bag: water containers, filter, ready‑to‑eat calories, headlamp, power bank+cords, whistle, copies of IDs, cash, basic first‑aid kit, respirator (P2/N95), map & pencil.</li>
+          <li>Home base: 2–4 weeks pantry; water storage; sanitation supplies; multi‑day lighting; radio; tool roll; repair kit; spare meds; warm layers & sun kit; pet plan.</li>
+          <li>Plan: family contact tree, meet‑points, signal cues, neighbors network, hazard map.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel" id="inventory">
+      <h3>Inventory & Evidence Log</h3>
+      <div class="grid two">
+        <div class="panel">
+          <label>Item <input id="invName" placeholder="e.g., Headlamp / Maize flour / Chlorine tabs"></label>
+          <label>Qty <input id="invQty" type="number" min="0" step="1" value="1"></label>
+          <label>Notes <input id="invNote" placeholder="expiry, location, kcal, etc."></label>
+          <button id="invAdd" class="good">Add</button>
+        </div>
+        <div class="panel">
+          <div class="inline"><span class="muted">Filter</span><input id="invFilter" placeholder="type to search"></div>
+          <div id="invList" style="max-height:240px; overflow:auto"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WATER MODULE ================= -->
+  <section id="water" class="panel">
+    <h2>Water Sovereignty</h2>
+    <p class="muted">Harvest, store, make safe, and distribute water—household to village.</p>
+
+    <div class="grid two" id="calc">
+      <div class="panel">
+        <h3>Rain & Storage Sizer</h3>
+        <label>Annual rainfall (mm) <input id="rain" type="number" value="150"></label>
+        <label>Catchment area (m²) <input id="area" type="number" value="120"></label>
+        <label>Runoff coefficient (0–1) <input id="coef" type="number" step="0.05" value="0.85"></label>
+        <label>Dry‑season bridge (days) <input id="drydays" type="number" value="90"></label>
+        <label>Household (people) <input id="people" type="number" value="5"></label>
+        <label>L/person/day (15–50) <input id="lppd" type="number" value="20"></label>
+        <button id="runCalc" class="primary">Compute</button>
+      </div>
+      <div class="panel">
+        <h3>Results</h3>
+        <div id="calcOut"></div>
+        <p class="muted">Aim for split tanks (e.g., 2×30 m³) and first‑flush diverters for roof run‑off.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Make Water Safer — layered barriers</h3>
+      <ol>
+        <li><strong>Source hygiene:</strong> roof screens + first‑flush diverter before storage.</li>
+        <li><strong>Filtration:</strong> cloth pre‑filter → slow/biosand filter for turbidity/pathogen reduction. 6</li>
+        <li><strong>Disinfection:</strong> Boil where practical. If using unscented household bleach, follow authoritative dosing (see card below), wait ≥30 min, confirm faint chlorine smell; cloudy/very cold water may require doubling per guidance. 7</li>
+        <li><strong>SODIS:</strong> clear PET in full sun ≥6 h (longer if very cloudy) as a **backup** method. (High UV regions help; still not universal.)</li>
+        <li><strong>Storage:</strong> dedicated, clean, capped containers; avoid re‑contamination.</li>
+      </ol>
+      <div class="note"><strong>Target provisioning:</strong> Sphere/WHO planning bands: 15–20 L/person/day for basic use; initial survival minimums can be 7.5–15 L in acute phases (short‑term only). 8</div>
+    </div>
+
+    <div class="panel">
+      <h3>Disinfection Cheat Sheet (authoritative figures)</h3>
+      <ul>
+        <li><strong>EPA emergency dosing:</strong> For **1 L** of water → **2 drops** of **6% or 8.25%** unscented bleach. For **1 gal** → **8 drops (6%) / 6 drops (8.25%)**. Wait ≥30 min. Double if cloudy/very cold. 9</li>
+        <li><strong>WHO emergency note:</strong> Some WHO cholera guidance suggests **3–5 drops/L**; contexts differ. If local public health advice exists, follow that. Aim for residual free chlorine ~0.2–0.5 mg/L. 10</li>
+      </ul>
+      <p class="muted">Different guidelines reflect source water quality and operational targets; use test strips when you can.</p>
+    </div>
+  </section>
+
+  <!-- ================= FOOD MODULE ================= -->
+  <section id="food" class="panel">
+    <h2>Food Sovereignty</h2>
+    <div class="grid two">
+      <div class="panel">
+        <h3>Kitchen Gardens → Seed → Storage</h3>
+        <ul>
+          <li><strong>Kitchen/home gardens</strong> improve diet diversity when adapted to local climate & culture; pair with peer mentoring. 11</li>
+          <li><strong>Seed systems:</strong> strengthen household & community seed saving; coordinate varietal choice and seed quality. 12</li>
+          <li><strong>Post‑harvest:</strong> dry staples to safe moisture (maize ≲13–13.5%); cooler, dry storage multiplies shelf life. 13</li>
+          <li><strong>Calorie baseline:</strong> plan around ~2,100 kcal/person/day (adjust for climate, workload, age). 14</li>
+        </ul>
+      </div>
+      <div class="panel" id="caloriePlanner">
+        <h3>Calorie Planner</h3>
+        <label>People <input id="calPeople" type="number" value="5"></label>
+        <label>Days <input id="calDays" type="number" value="30"></label>
+        <label>Target kcal/person/day <input id="calPer" type="number" value="2100"></label>
+        <button id="calcCal" class="primary">Compute Calories</button>
+        <div id="calOut" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Low‑Cost Food Infrastructure (materials sourcing)</h3>
+      <ul>
+        <li><strong>Raised beds / keyholes:</strong> reclaimed brick, stone, or timber; cardboard weed‑barrier; compost from kitchen waste + dry carbon (leaves/straw).</li>
+        <li><strong>Micro‑irrigation:</strong> gravity bucket + mainline hose + drippers or perforated tape; mulch (gravel, straw, or biodegradable film) to reduce evaporation.</li>
+        <li><strong>Solar dryer:</strong> scrap timber frame, clear sheet cover, black tray, insect mesh; locate in ventilated sun; pre‑dry sliced produce. (Mind food safety temps.)</li>
+        <li><strong>Rodent‑safe storage:</strong> metal bins/lidded drums for grains; improved cribs sized to humidity bands; desiccant sachets in sealed containers. 15</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= HEALTH & FIRST AID ================= -->
+  <section class="panel" id="health">
+    <h2>Health & First‑Aid Essentials (safe scope)</h2>
+    <div class="grid two">
+      <div class="panel">
+        <h3>First‑aid pillars (evidence‑based)</h3>
+        <ul>
+          <li><strong>DR‑ABC</strong> approach; call for help early; use PPE; manage bleeding with direct pressure; cool burns with cool running water; prevent hypothermia. 16</li>
+          <li><strong>Hand hygiene:</strong> Prefer plain soap + water or ABHR (≥60%); alternatives like ash are **not** counted as soap in global monitoring and are last‑resort in some emergency guidance. 17</li>
+          <li><strong>ORS (oral rehydration solution) when packets are unavailable:</strong> Dissolve **6 level tsp sugar + 1/2 level tsp salt** in **1 L** clean water. Measure carefully. Seek care if danger signs. 18</li>
+        </ul>
+        <div class="note"><strong>We do not provide lab protocols or drug synthesis/culturing steps.</strong> Use approved medicines from legitimate suppliers and follow local clinical guidance.</div>
+      </div>
+      <div class="panel">
+        <h3>Mycelium & Local Materials — Safe, non‑ingestive uses</h3>
+        <ul>
+          <li><strong>Myco‑materials:</strong> mycelium‑based composites for insulation/packaging; promising but not load‑bearing yet. Dry thoroughly to stop growth. 19</li>
+          <li><strong>Mycofiltration (high‑level concept only):</strong> fungal mycelium as a **filter medium** can reduce some pollutants in stormwater pilots; treat as **experimental** and not a replacement for proven household treatment. 20</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= QUESTS ================= -->
+  <section id="quests" class="panel">
+    <h2>Quest Log</h2>
+    <div class="grid two">
+      <div class="panel">
+        <h3>Survival Core</h3>
+        <div class="grid" id="quests-core"></div>
+      </div>
+      <div class="panel">
+        <h3>Water</h3>
+        <div class="grid" id="quests-water"></div>
+      </div>
+      <div class="panel">
+        <h3>Food</h3>
+        <div class="grid" id="quests-food"></div>
+      </div>
+      <div class="panel">
+        <h3>Health</h3>
+        <div class="grid" id="quests-health"></div>
+      </div>
+    </div>
+    <div class="inline" style="margin-top:8px;gap:12px">
+      <button id="addQuest">Add custom quest</button>
+      <button id="resetQuests" class="warn">Reset defaults</button>
+      <span class="muted right">Checked quests grant XP; completions raise Level.</span>
+    </div>
+  </section>
+
+  <!-- ================= HABITICA ================= -->
+  <section class="panel" id="habitica">
+    <h2>Habitica Integration</h2>
+    <p class="muted">Push selected quests as Tasks to your Habitica account (credentials saved locally only).</p>
+    <div class="grid two">
+      <div class="panel">
+        <h3>Credentials</h3>
+        <label>User ID <input id="habUser" placeholder="UUID"></label>
+        <label>API Token <input id="habToken" placeholder="secret token"></label>
+        <label>Client Tag (optional) <input id="habClient" placeholder="yourUser-water-food-guide"></label>
+        <div class="inline"><button id="saveHab" class="primary">Save</button><button id="clearHab" class="bad">Clear</button></div>
+      </div>
+      <div class="panel">
+        <h3>Push</h3>
+        <label>Task Type
+          <select id="habType">
+            <option value="todo">To‑Do</option>
+            <option value="daily">Daily</option>
+            <option value="habit">Habit</option>
+          </select>
+        </label>
+        <button id="pushSelected" class="good">Push selected quests → Habitica</button>
+        <pre id="habLog" class="muted" style="white-space:pre-wrap; max-height:180px; overflow:auto"></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WEBLLM ASSISTANT ================= -->
+  <section class="panel" id="assistant">
+    <h2>Field Assistant (WebLLM · private)</h2>
+    <p class="muted">In‑browser LLM via WebGPU. First load downloads the model for offline re‑use.</p>
+    <div class="panel">
+      <div class="inline" style="gap:8px; flex-wrap:wrap">
+        <label>Model
+          <select id="modelPick">
+            <option value="Llama-3.2-3B-Instruct-q4f32_1-MLC">Llama‑3.2‑3B‑Instruct‑q4f32_1</option>
+            <option value="Phi-3-mini-4k-instruct-q4f16_1-MLC">Phi‑3‑mini‑4k‑instruct‑q4f16_1</option>
+          </select>
+        </label>
+        <button id="loadModel" class="primary">Load/Reload</button>
+        <span id="modelStatus" class="muted">Not loaded</span>
+      </div>
+      <div class="panel" style="margin-top:8px">
+        <div id="chatLog" style="min-height:160px; max-height:320px; overflow:auto; background:#070d1a; padding:10px; border-radius:8px"></div>
+        <div class="inline" style="margin-top:8px"><input id="chatInput" placeholder="Ask about water, storage, gardens, first-aid scope…"><button id="sendChat">Ask</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel muted" style="margin-bottom:80px">
+    <h2>Notes on scope & safety</h2>
+    <p>This guide is practical and educational. It avoids unsafe content like drug synthesis, culturing organisms to produce medical compounds, or detailed chemical extraction methods. For clinical care, follow local health authority guidance and see a trained professional when possible.</p>
+  </section>
+</main>
+
+<!-- ================= STARFIELD ================= -->
+<script>
+(function(){
+  const c = document.getElementById('stars');
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const ctx = c.getContext('2d', { alpha:true });
+  let W,H,DPR=Math.min(devicePixelRatio||1,2), stars=[];
+  const L1=320, L2=220, L3=120, TW=0.02;
+  function resize(){ W=c.width=Math.floor(innerWidth*DPR); H=c.height=Math.floor(innerHeight*DPR); c.style.width=innerWidth+'px'; c.style.height=innerHeight+'px'; spawn(); }
+  function rnd(a,b){ return a+Math.random()*(b-a); }
+  function spawn(){ stars=[]; mk(L1,1); mk(L2,2); mk(L3,3); function mk(n,z){ for(let i=0;i<n;i++){ const x=Math.random()*W,y=Math.random()*H,r=rnd(.5, z===1?1.6:z===2?1.3:1.0)*DPR, base=rnd(.2,1), hue=rnd(210,250); stars.push({x,y,r,z,a:base,t:Math.random()*Math.PI*2,hue}); } } }
+  function step(){ ctx.clearRect(0,0,W,H); for(const s of stars){ s.t += (TW + Math.random()*0.01); const tw = .6 + .4*Math.sin(s.t + s.x*1e-4); const alpha = Math.min(1, Math.max(.05, s.a*tw)); s.x += (s.z===1?.015:s.z===2?.03:.06); if(s.x>W+10) s.x=-10, s.y=Math.random()*H;
+    const g = ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*3);
+    g.addColorStop(0, `hsla(${s.hue},80%,85%,${alpha})`); g.addColorStop(1, `hsla(${s.hue},90%,10%,0)`);
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(s.x,s.y,s.r*3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=`hsla(${s.hue},100%,95%,${Math.min(1,alpha+.15)})`; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+  } requestAnimationFrame(step); }
+  addEventListener('resize', resize, {passive:true}); resize(); step();
+})();
+</script>
+
+<!-- ================= INDEXEDDB, STATE, QUESTS ================= -->
+<script>
+const DB_NAME='sovereignDB', DB_VER=1; let db;
+function openDB(){ return new Promise((res,rej)=>{ const r=indexedDB.open(DB_NAME,DB_VER);
+  r.onupgradeneeded=e=>{ db=e.target.result;
+    db.createObjectStore('quests',{keyPath:'id'});
+    db.createObjectStore('settings',{keyPath:'key'});
+    db.createObjectStore('habitica',{keyPath:'key'});
+    db.createObjectStore('inventory',{keyPath:'id'});
+  };
+  r.onsuccess=e=>{ db=e.target.result; res(); }; r.onerror=rej;
+});}
+function tx(store,mode='readonly'){ return db.transaction(store,mode).objectStore(store); }
+function put(store,val){ return new Promise((res,rej)=>{ const r=tx(store,'readwrite').put(val); r.onsuccess=()=>res(); r.onerror=rej; }); }
+function get(store,key){ return new Promise((res,rej)=>{ const r=tx(store).get(key); r.onsuccess=()=>res(r.result); r.onerror=rej; }); }
+function getAll(store){ return new Promise((res,rej)=>{ const r=tx(store).getAll(); r.onsuccess=()=>res(r.result); r.onerror=rej; }); }
+function del(store,key){ return new Promise((res,rej)=>{ const r=tx(store,'readwrite').delete(key); r.onsuccess=()=>res(); r.onerror=rej; }); }
+
+const state={ level:1, xp:0 };
+function levelTitle(l){ return (l>=9?'Sovereign Architect': l>=7?'River & Garden Steward': l>=5?'Resilience Wright': l>=3?'Tankwright': l>=2?'Trail Adept':'Initiate'); }
+function syncHUD(){
+  document.getElementById('level').textContent = `${state.level} — ${levelTitle(state.level)}`;
+  document.getElementById('xp').textContent = state.xp;
+  const total = document.querySelectorAll('.quest input[type=checkbox]').length;
+  const done = [...document.querySelectorAll('.quest input[type=checkbox]:checked')].length;
+  document.getElementById('meter').style.width = (total? Math.round(100*done/total):0)+'%';
+}
+function gainXP(n){ state.xp += n; const t=[0,80,180,340,560,820,1140,1500,1900,2350]; const nl=t.findIndex(v=>state.xp<v); state.level=(nl===-1?t.length:Math.max(1,nl)); put('settings',{key:'profile', value:state}); syncHUD(); }
+
+function questEl(q){
+  const el = document.createElement('label'); el.className='quest'; el.style.display='flex'; el.style.gap='12px'; el.style.alignItems='flex-start';
+  el.style.padding='10px'; el.style.border='1px solid rgba(125,211,252,.1)'; el.style.borderRadius='10px'; el.style.background='#0b0f1a';
+  el.innerHTML = `<input type="checkbox" ${q.done?'checked':''} data-id="${q.id}"><div><strong>${q.title}</strong><small style="display:block;color:#a2b3c7">${q.notes||''}</small><small class="muted">+${q.xp} XP</small></div>`;
+  el.querySelector('input').addEventListener('change', async ev=>{ const done=ev.target.checked; await put('quests',{...q,done}); gainXP(done? q.xp : -q.xp); });
+  return el;
+}
+
+const defaults = {
+  core: [
+    {id:'c-go-bag', xp:20, title:'Assemble go‑bag', notes:'Water, calories, light, comms, first‑aid, documents, cash, PPE.'},
+    {id:'c-plan', xp:15, title:'Write & share a family plan', notes:'Contacts, meet points, map, neighbors network.'},
+    {id:'c-signal', xp:10, title:'Practice signaling & power‑out drill', notes:'Whistle, headlamp, radio, quiet check‑ins.'}
+  ],
+  water: [
+    {id:'w-primer', xp:10, title:'Review Water barriers', notes:'Source hygiene → Filter → Disinfect → Safe storage.'},
+    {id:'w-calc', xp:20, title:'Run rain & storage sizer', notes:'Bridge target and safety margin.'},
+    {id:'w-firstflush', xp:25, title:'Install first‑flush diverters', notes:'Keep the first wash out of tanks.'},
+    {id:'w-biosand', xp:40, title:'Build/inspect a biosand or slow‑sand unit', notes:'Flow, schmutzdecke maturation, leak check.'},
+    {id:'w-disinfect', xp:25, title:'Make a disinfection plan', notes:'Boil where possible; EPA/WHO figures for bleach if needed.'}
+  ],
+  food: [
+    {id:'f-bed', xp:25, title:'Build a raised/keyhole bed', notes:'Local stone/brick/timber + mulch.'},
+    {id:'f-seed', xp:30, title:'Set up a seed‑saving cycle', notes:'Dry, label, store; mix varietal resilience.'},
+    {id:'f-dryer', xp:30, title:'Assemble a solar dryer', notes:'Ventilation + mesh; food safety temps.'},
+    {id:'f-storage', xp:25, title:'Dry grain to safe moisture', notes:'Maize ≲13–13.5%; rodent‑proof bins/cribs.'}
+  ],
+  health: [
+    {id:'h-abc', xp:25, title:'Practice DR‑ABC scenario', notes:'Scene safety, response, airway/breathing/circulation.'},
+    {id:'h-hygiene', xp:20, title:'Set up hand‑hygiene stations', notes:'Soap + water or ABHR ≥60%.'},
+    {id:'h-ors', xp:30, title:'Mix demonstration ORS (training)', notes:'6 tsp sugar + 1/2 tsp salt per 1 L (practice with supervision).'}
+  ]
+};
+
+async function seedQuests(){
+  const has = await getAll('quests');
+  if(has.length>0) return;
+  for(const k of Object.keys(defaults)){
+    for(const q of defaults[k]) await put('quests',{...q, done:false, cat:k});
+  }
+}
+
+async function renderQuests(){
+  const rows = await getAll('quests');
+  const byCat = {core:[], water:[], food:[], health:[]};
+  rows.forEach(r=>byCat[r.cat]?.push(r));
+  for(const [cat, arr] of Object.entries(byCat)){
+    const mount = document.getElementById('quests-'+cat);
+    if(!mount) continue;
+    mount.innerHTML=''; arr.forEach(q=>mount.appendChild(questEl(q)));
+  }
+  syncHUD();
+}
+
+document.getElementById('addQuest').onclick = async ()=>{
+  const title=prompt('Quest title'); if(!title) return;
+  const notes=prompt('Notes (optional)')||''; const xp=Math.max(5,Math.min(100, parseInt(prompt('XP (5–100)','20')||'20',10)));
+  const cat = prompt('Category (core/water/food/health)','core')||'core';
+  const id='q-'+Math.random().toString(36).slice(2);
+  await put('quests',{id,title,notes,xp,done:false,cat});
+  renderQuests();
+};
+document.getElementById('resetQuests').onclick = async ()=>{
+  const all=await getAll('quests'); await Promise.all(all.map(r=>del('quests', r.id))); await seedQuests(); renderQuests();
+};
+</script>
+
+<!-- ================= CALCULATORS, INVENTORY, EXPORT/IMPORT ================= -->
+<script>
+const rainInput=document.getElementById('rain');
+const areaInput=document.getElementById('area');
+const coefInput=document.getElementById('coef');
+const drydays=document.getElementById('drydays');
+const peopleInput=document.getElementById('people');
+const lppdInput=document.getElementById('lppd');
+document.getElementById('runCalc').onclick=()=>{
+  const rain=+rainInput.value, area=+areaInput.value, coef=+coefInput.value, dry=+drydays.value, people=+peopleInput.value, lppd=+lppdInput.value;
+  const annualLiters = Math.max(0, rain*area*coef);
+  const dailyNeed = people * lppd;
+  const bridge = dailyNeed * dry;
+  const tanks = Math.max(1, Math.ceil(bridge/30000));
+  document.getElementById('calcOut').innerHTML=`
+    <div class="tag">Annual harvest ≈ <strong>${Math.round(annualLiters).toLocaleString()}</strong> L</div>
+    <div class="tag">Dry‑bridge ≈ <strong>${Math.round(bridge).toLocaleString()}</strong> L</div>
+    <div class="tag">Split tanks: <strong>${tanks}</strong> × ~30 m³</div>
+    <p class="muted">Storminess & losses matter; keep a margin.</p>`;
+};
+
+document.getElementById('calcCal').onclick=()=>{
+  const p=+document.getElementById('calPeople').value, d=+document.getElementById('calDays').value, per=+document.getElementById('calPer').value;
+  const total = p*d*per;
+  document.getElementById('calOut').innerHTML=`<div class="tag">Total ≈ <strong>${total.toLocaleString()}</strong> kcal</div><p class="muted">Blend staples + proteins + fats + micronutrients.</p>`;
+};
+
+const exportBtn=document.getElementById('exportBtn');
+exportBtn.onclick=async()=>{
+  const dump={ profile:(await get('settings','profile'))?.value||state, quests:await getAll('quests'), habitica:await getAll('habitica'), inventory:await getAll('inventory'),
+    meta:{app:'sovereign-survival', version:1, exported:new Date().toISOString()} };
+  const blob=new Blob([JSON.stringify(dump,null,2)], {type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sovereign_progress.json'; a.click();
+};
+document.getElementById('importFile').onchange=async(e)=>{
+  const f=e.target.files[0]; if(!f) return; const txt=await f.text(); const data=JSON.parse(txt);
+  if(data.quests){ for(const q of data.quests){ await put('quests', q);} }
+  if(data.profile){ await put('settings',{key:'profile', value:data.profile}); Object.assign(state, data.profile); }
+  if(data.habitica){ for(const row of data.habitica){ await put('habitica', row);} }
+  if(data.inventory){ for(const it of data.inventory){ await put('inventory', it);} }
+  alert('Imported.'); renderQuests(); renderInventory(); syncHUD();
+};
+
+const invName=document.getElementById('invName'), invQty=document.getElementById('invQty'), invNote=document.getElementById('invNote'), invList=document.getElementById('invList'), invFilter=document.getElementById('invFilter');
+document.getElementById('invAdd').onclick=async()=>{
+  const name=invName.value.trim(); if(!name) return;
+  const row={id:'i-'+Math.random().toString(36).slice(2), name, qty:+invQty.value||0, note:invNote.value.trim()}; await put('inventory', row);
+  invName.value=''; invQty.value='1'; invNote.value=''; renderInventory();
+};
+invFilter.oninput=()=>renderInventory();
+async function renderInventory(){
+  const rows=await getAll('inventory'); const q=(invFilter.value||'').toLowerCase();
+  const around = rows.filter(r=>!q || r.name.toLowerCase().includes(q) || (r.note||'').toLowerCase().includes(q));
+  invList.innerHTML='';
+  around.forEach(r=>{
+    const div=document.createElement('div'); div.className='card'; div.style.padding='10px';
+    div.innerHTML=`<div class="inline"><b>${r.name}</b><span class="right muted">x${r.qty}</span></div><div class="muted">${r.note||''}</div>
+      <div class="inline" style="gap:8px;margin-top:6px"><button data-id="${r.id}" class="bad">Delete</button></div>`;
+    div.querySelector('button').onclick=async()=>{ await del('inventory', r.id); renderInventory(); };
+    invList.appendChild(div);
+  });
+}
+</script>
+
+<!-- ================= HABITICA INTEGRATION ================= -->
+<script>
+const habUser=document.getElementById('habUser'), habToken=document.getElementById('habToken'), habClient=document.getElementById('habClient'), habLog=document.getElementById('habLog');
+async function loadHab(){ const u=await get('habitica','user'); const k=await get('habitica','token'); const c=await get('habitica','client'); if(u) habUser.value=u.value; if(k) habToken.value=k.value; if(c) habClient.value=c.value; }
+document.getElementById('saveHab').onclick=async()=>{ await put('habitica',{key:'user', value:habUser.value.trim()}); await put('habitica',{key:'token', value:habToken.value.trim()}); await put('habitica',{key:'client', value:habClient.value.trim()}); habLog.textContent+='Saved.\n'; };
+document.getElementById('clearHab').onclick=async()=>{ await del('habitica','user'); await del('habitica','token'); await del('habitica','client'); habUser.value=habToken.value=habClient.value=''; habLog.textContent+='Cleared.\n'; };
+document.getElementById('pushSelected').onclick=async()=>{
+  const user=habUser.value.trim(), token=habToken.value.trim(); if(!user||!token){ alert('Set Habitica credentials first.'); return; }
+  const client=(habClient.value.trim()|| (user+'-sovereign'));
+  const type=document.getElementById('habType').value;
+  const selected = [...document.querySelectorAll('.quest input:checked')].map(el=>{
+    const title=el.parentElement.querySelector('strong').textContent;
+    const notes=el.parentElement.querySelector('small').textContent;
+    const xp=el.parentElement.querySelectorAll('small')[1].textContent;
+    return {title, notes, xp};
+  });
+  if(selected.length===0){ alert('Check some quests to push.'); return; }
+
+  for(const q of selected){
+    try{
+      const body = { type, text:q.title, notes:`${q.notes}\n\n[Sovereign Survival] ${q.xp}`, priority:1.5, checklist:[{text:'Evidence logged'},{text:'Review next month'}]};
+      const res = await fetch('https://habitica.com/api/v3/tasks/user', {
+        method:'POST', headers:{ 'Content-Type':'application/json','x-api-user':user,'x-api-key':token,'x-client':client }, body:JSON.stringify(body)
+      });
+      const json=await res.json(); if(!res.ok) throw new Error(JSON.stringify(json)); habLog.textContent+=`Pushed: ${q.title}\n`;
+    }catch(err){ habLog.textContent+=`Error: ${q.title} -> ${err.message}\n`; }
+  }
+};
+</script>
+
+<!-- ================= WEBLLM ================= -->
+<script>
+let engine=null;
+const modelPick=document.getElementById('modelPick'), modelStatus=document.getElementById('modelStatus'), chatLog=document.getElementById('chatLog'), chatInput=document.getElementById('chatInput'), sendChat=document.getElementById('sendChat'), loadModelBtn=document.getElementById('loadModel');
+function addBubble(who,text){ const div=document.createElement('div'); div.style.margin='6px 0'; div.innerHTML=`<b>${who}:</b> ${text}`; chatLog.appendChild(div); chatLog.scrollTop=chatLog.scrollHeight; }
+async function ensureWebLLM(){ try{ const mod=await import('https://esm.run/@mlc-ai/web-llm'); return mod; }catch(e){ modelStatus.textContent='Failed to load WebLLM library.'; return null; } }
+loadModelBtn.onclick=async()=>{ const webllm=await ensureWebLLM(); if(!webllm) return; const model=modelPick.value; modelStatus.textContent='Loading '+model+' …';
+  try{ engine=await webllm.CreateMLCEngine(model, {initProgressCallback:p=>{ modelStatus.textContent=`Loading ${Math.round(p.progress*100)}%`; }}); modelStatus.textContent='Model ready';
+  }catch(e){ modelStatus.textContent='Model load error (need WebGPU?)'; console.error(e); } };
+sendChat.onclick=async()=>{ if(!engine){ addBubble('System','Load a model first.'); return; }
+  const q=chatInput.value.trim(); if(!q) return; addBubble('You', q); chatInput.value='';
+  const resp=await engine.chat.completions.create({messages:[{role:'system', content:'Stay within safe scope: no lab protocols, no culturing, no drug synthesis. Offer evidence-based first-aid basics, water/food sovereignty, and safe materials sourcing. Be concise.'},{role:'user', content:q}], stream:true});
+  let acc=''; for await (const chunk of resp){ const token=chunk.choices?.[0]?.delta?.content||''; acc+=token; } addBubble('Assistant', acc);
+};
+</script>
+
+<!-- ================= BOOT ================= -->
+<script>
+const newGame=document.getElementById('newGame');
+(async function boot(){
+  await openDB();
+  document.getElementById('lbTag').textContent='Low‑BW: ' + (navigator.connection?.effectiveType||'unknown');
+  const saved=await get('settings','profile'); if(saved?.value) Object.assign(state, saved.value);
+  await seedQuests(); await renderQuests(); await renderInventory(); syncHUD();
+  newGame.onclick=async()=>{ await put('settings',{key:'profile', value:{level:1,xp:0}}); state.level=1; state.xp=0; syncHUD(); };
+  await loadHab();
+})();
+</script>
+
+</body>
+</html>
